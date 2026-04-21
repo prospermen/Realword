@@ -1,0 +1,29 @@
+{
+  "scripts": {
+    "dev": "npx tsx src/server.ts",
+    "build": "npx tsc -p tsconfig.json",
+    "build:render": "npm run prisma:generate && npm run build",
+    "start": "node dist/server.js",
+    "start:render": "npm run prisma:migrate:deploy && npm run start",
+    "test": "npx ts-node --project tsconfig.test.json --transpile-only test/run-tests.ts",
+    "prisma:migrate:deploy": "npx prisma migrate deploy",
+    "prisma:push": "npx prisma db push",
+    "prisma:generate": "npx prisma generate"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.22.0",
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^17.3.1",
+    "jsonwebtoken": "^9.0.3",
+    "multer": "^2.1.1",
+    "prisma": "^5.22.0",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/cors": "^2.8.19",
+    "@types/jsonwebtoken": "^9.0.10",
+    "@types/multer": "^2.1.0"
+  }
+}

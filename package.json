@@ -1,0 +1,26 @@
+{
+  "name": "copy-project",
+  "version": "1.0.0",
+  "main": "app.ts",
+  "scripts": {
+    "dev": "cd backend && npx tsx src/server.ts",
+    "dev:backend": "cd backend && npx tsx src/server.ts",
+    "dev:frontend": "cd frontend && npm run dev",
+    "start": "cd backend && npx tsx src/server.ts",
+    "test": "npm run test:backend",
+    "test:backend": "cd backend && npx ts-node --project tsconfig.test.json --transpile-only test/run-tests.ts"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "@types/express": "^5.0.6",
+    "express": "^5.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^25.5.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^6.0.2"
+  }
+}

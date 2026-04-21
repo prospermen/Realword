@@ -1,0 +1,104 @@
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  username  String   @unique
+  password  String
+  bio       String?
+  image     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 一个用户写了多篇文章
+  articles  Article[]
+  // 一个用户写了多条评论
+  comments  Comment[]
+  // 关注关系：我关注了谁
+  following Follow[]  @relation("follower")
+  // 关注关系：谁关注了我
+  followers Follow[]  @relation("following")
+  // 收藏关系
+  favorites Favorite[]
+}
+
+model Article {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  description String
+  body        String
+  isDraft     Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // 外键：文章属于哪个用户
+  authorId    Int
+  author      User     @relation(fields: [authorId], references: [id])
+
+  // 多对多：文章有哪些标签（通过 ArticleTag 中间表）
+  tags        ArticleTag[]
+  // 一篇文章有多条评论
+  comments    Comment[]
+  // 多对多：哪些用户收藏了这篇文章（通过 Favorite 中间表）
+  favoritedBy Favorite[]
+}
+
+// 标签表
+model Tag {
+  id       Int          @id @default(autoincrement())
+  name     String       @unique
+  articles ArticleTag[]
+}
+
+// 文章-标签 多对多中间表
+model ArticleTag {
+  articleId Int
+  tagId     Int
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  tag       Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([articleId, tagId])
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  body      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // 评论属于哪个用户
+  authorId  Int
+  author    User    @relation(fields: [authorId], references: [id])
+  // 评论属于哪篇文章
+  articleId Int
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+}
+
+// 关注关系中间表（followerId 关注了 followingId）
+model Follow {
+  followerId  Int
+  followingId Int
+  follower    User @relation("follower", fields: [followerId], references: [id])
+  following   User @relation("following", fields: [followingId], references: [id])
+
+  @@id([followerId, followingId])
+}
+
+// 收藏关系中间表
+model Favorite {
+  userId    Int
+  articleId Int
+  user      User    @relation(fields: [userId], references: [id])
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+
+  @@id([userId, articleId])
+}
