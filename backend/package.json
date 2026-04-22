@@ -3,6 +3,7 @@
     "dev": "npx tsx src/server.ts",
     "build": "npx tsc -p tsconfig.json",
     "build:render": "npm run prisma:generate && npm run build",
+    "postinstall": "npm run prisma:generate",
     "start": "node dist/server.js",
     "start:render": "npm run prisma:migrate:deploy && npm run start",
     "test": "npx ts-node --project tsconfig.test.json --transpile-only test/run-tests.ts",
