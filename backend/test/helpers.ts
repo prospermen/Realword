@@ -1,9 +1,9 @@
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import type { AddressInfo } from 'node:net';
 
 const backendDir = path.resolve(__dirname, '..');
-const sourceDbPath = path.resolve(backendDir, 'prisma', 'dev.db');
 const testDbPath = path.resolve(backendDir, 'test', 'test.db');
 const testDbJournalPath = `${testDbPath}-journal`;
 const databaseUrl = `file:${testDbPath.replace(/\\/g, '/')}`;
@@ -13,7 +13,7 @@ process.env.JWT_SECRET = 'integration-test-secret';
 process.env.DATABASE_URL = databaseUrl;
 
 cleanupTestDatabaseFiles();
-fs.copyFileSync(sourceDbPath, testDbPath);
+initializeTestDatabase();
 
 let baseUrl = '';
 let server: any = null;
@@ -70,6 +70,19 @@ function cleanupTestDatabaseFiles() {
       fs.unlinkSync(filePath);
     }
   }
+}
+
+function initializeTestDatabase() {
+  const prismaCliPath = require.resolve('prisma/build/index.js');
+
+  execFileSync(process.execPath, [prismaCliPath, 'migrate', 'deploy'], {
+    cwd: backendDir,
+    env: {
+      ...process.env,
+      DATABASE_URL: databaseUrl,
+    },
+    stdio: 'pipe',
+  });
 }
 
 export async function apiRequest(pathname: string, init: RequestInit = {}) {
